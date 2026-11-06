@@ -4,25 +4,53 @@
 
 My build of Christian Selig's Caldera. Firmware is ZMK **v0.3**, built automatically by GitHub Actions on every push.
 
-**Updating the firmware**
-1. Push a change, open the **Actions** tab, and download the firmware zip from the latest successful run.
-2. Plug the half in over USB and put it in flashing mode: tap the left-thumb key (next to the left spacebar), press **B**, then press the top-left key (Esc spot) for the left half or the top-right key (Backspace spot) for the right half. (Double-tapping the physical reset button also works.) It shows up as a USB drive.
-3. Drag `caldera_left_studio.uf2` onto the left half, or `caldera_right-nice_nano_v2-zmk.uf2` onto the right half.
-4. If the halves won't talk to each other afterward, flash `settings_reset-nice_nano_v2-zmk.uf2` to both, then the normal files again, then turn both on and tap both reset buttons together.
+### Updating the firmware
 
-**Changing keys without flashing (ZMK Studio)**
+**Step 1: Get the firmware files**
+1. On GitHub, open the **Actions** tab and click the latest run with a green check mark.
+2. Scroll down to **Artifacts**, download the firmware zip, and unzip it. You'll use:
+   - `caldera_left_studio.uf2` for the left half
+   - `caldera_right-nice_nano_v2-zmk.uf2` for the right half
+
+**Step 2: Flash each half using keys (no reset button needed)**
+
+Both halves must be switched **on** and connected to each other, because the left half reads the keys for both.
+
+1. Plug the half you're flashing into your computer with a USB cable.
+2. Tap the **left-thumb key** (bottom row, next to the left spacebar).
+3. Press **B**. This locks on the System layer.
+4. Press the flashing key for the half that's plugged in:
+   - **Left half:** the top-left key (where Esc is)
+   - **Right half:** the top-right key (where Backspace is)
+5. The half restarts and appears on your computer as a USB drive (named something like `NICENANO`).
+6. Drag that half's `.uf2` file onto the drive. It copies, ejects itself, and restarts with the new firmware. Windows may warn that the drive was removed unexpectedly. That's normal.
+7. Repeat for the other half.
+
+**When you still need the physical reset button** (double-tap it to get the USB drive):
+- The **first time** you flash a firmware that has these flashing keys, since the old firmware doesn't have them.
+- After flashing `settings_reset` (it has no keys at all).
+- If a half is frozen or the halves won't connect.
+
+**If the halves won't talk to each other after an update**
+1. Use the reset button to flash `settings_reset-nice_nano_v2-zmk.uf2` onto **both** halves.
+2. Flash the normal left and right files again.
+3. Turn both halves on and tap both reset buttons at the same time.
+4. Re-pair the keyboard with your computer (settings reset forgets all Bluetooth pairings).
+
+### Changing keys without flashing (ZMK Studio)
 1. Plug the **left** half in over USB and open https://zmk.studio in Chrome/Edge (or the desktop app).
 2. Unlock the keyboard: tap the left-thumb key (next to the left spacebar), press **B** (System layer), then press **Q**. If the keyboard is also connected over Bluetooth, press **U** on the System layer to send to USB. Press the "go home" key (4th from left, bottom row) to leave.
 3. Edit keys and save. Note that Studio edits are stored on the keyboard and override `config/caldera.keymap` until you choose "Restore Stock Settings" in Studio.
 
-**Where things are**
+### Where things are
 - `config/caldera.keymap`: the keymap (layers and what each key does)
 - `config/boards/shields/caldera/caldera.conf`: settings for both halves (sleep, Bluetooth power, etc.)
 - `config/boards/shields/caldera/caldera.dtsi`: wiring (which controller pins are rows/columns)
 - `config/boards/shields/caldera/caldera-layouts.dtsi`: key positions shown in ZMK Studio
 - `build.yaml`: which firmware files GitHub builds
 
-**Pin reference** (ZMK uses Pro Micro numbers; Ergogen/KiCad use nice!nano names)
+### Pin reference
+ZMK uses Pro Micro numbers; Ergogen/KiCad use nice!nano names.
 
 | Pro Micro | nice!nano | Used for |
 |---|---|---|
