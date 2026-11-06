@@ -1,23 +1,25 @@
-# This file generates the GitHub Actions matrix
-# For simple board + shield combinations, add them
-# to the top level board and shield arrays, for more
-# control, add individual board + shield combinations to
-# the `include` property, e.g:
-#
-# board: [ "nice_nano_v2" ]
-# shield: [ "corne_left", "corne_right" ]
-# include:
-#   - board: bdn9_rev2
-#   - board: nice_nano_v2
-#     shield: reviung41
-#
+# Tells GitHub Actions which firmware files to build.
+# Each entry below produces one .uf2 file in the build's downloadable zip.
 ---
 include:
+  # Left half (central: the half that talks to your computer).
+  # The snippet + cmake-args enable ZMK Studio. Only the central half needs them.
   - board: nice_nano_v2
     shield: caldera_left
+    snippet: studio-rpc-usb-uart
+    cmake-args: -DCONFIG_ZMK_STUDIO=y
+    artifact-name: caldera_left_studio
+
+  # Right half (peripheral: talks only to the left half).
   - board: nice_nano_v2
     shield: caldera_right
-  - board: nice_nano_v2 
+
+  # Flash this to a half to wipe its saved Bluetooth pairings/settings
+  # (and any ZMK Studio keymap edits), then flash the normal firmware again.
+  - board: nice_nano_v2
     shield: settings_reset
+
+  # Diagnostic firmware: makes each controller pin "type" its own name,
+  # handy for finding a bad solder joint. Not for everyday use.
   - board: nice_nano_v2
     shield: tester_pro_micro

@@ -5,7 +5,9 @@ manifest:
   projects:
     - name: zmk
       remote: zmkfirmware
-      revision: main
+      # Pinned to a ZMK release so builds don't break when ZMK's main branch changes.
+      # To upgrade later, change this AND the @version in .github/workflows/build.yml.
+      revision: v0.3
       import: app/west.yml
   self:
     path: config

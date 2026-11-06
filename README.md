@@ -1,5 +1,39 @@
 # ⌨️ Caldera Keyboard
 
+## This fork (diloon0)
+
+My build of Christian Selig's Caldera. Firmware is ZMK **v0.3**, built automatically by GitHub Actions on every push.
+
+**Updating the firmware**
+1. Push a change, open the **Actions** tab, and download the firmware zip from the latest successful run.
+2. Turn the half off, plug it in over USB, and double-tap its reset button. It shows up as a USB drive.
+3. Drag `caldera_left_studio.uf2` onto the left half, or `caldera_right-nice_nano_v2-zmk.uf2` onto the right half.
+4. If the halves won't talk to each other afterward, flash `settings_reset-nice_nano_v2-zmk.uf2` to both, then the normal files again, then turn both on and tap both reset buttons together.
+
+**Changing keys without flashing (ZMK Studio)**
+1. Plug the **left** half in over USB and open https://zmk.studio in Chrome/Edge (or the desktop app).
+2. Unlock the keyboard: hold the Numpad layer key (the *second* key right of the right spacebar) and press the key where **Q** normally is.
+3. Edit keys and save. Note that Studio edits are stored on the keyboard and override `config/caldera.keymap` until you choose "Restore Stock Settings" in Studio.
+
+**Where things are**
+- `config/caldera.keymap`: the keymap (layers and what each key does)
+- `config/boards/shields/caldera/caldera.conf`: settings for both halves (sleep, Bluetooth power, etc.)
+- `config/boards/shields/caldera/caldera.dtsi`: wiring (which controller pins are rows/columns)
+- `config/boards/shields/caldera/caldera-layouts.dtsi`: key positions shown in ZMK Studio
+- `build.yaml`: which firmware files GitHub builds
+
+**Pin reference** (ZMK uses Pro Micro numbers; Ergogen/KiCad use nice!nano names)
+
+| Pro Micro | nice!nano | Used for |
+|---|---|---|
+| 2, 3, 4, 5, 6, 7 | P0.17, P0.20, P0.22, P0.24, P1.00, P0.11 | Columns |
+| 21, 20, 19, 18, 15 | P0.31, P0.29, P0.02, P1.15, P1.13 | Rows (number row to bottom row) |
+| 0, 1, 8, 9, 10, 14, 16 | P0.08, P0.06, P1.04, P1.06, P0.09, P1.11, P0.10 | **Free** (not connected on the PCB) |
+
+---
+
+## Original README
+
 This repo contains:
 
 - The [Ergogen](https://github.com/ergogen/ergogen) v4 `config.yaml` file
