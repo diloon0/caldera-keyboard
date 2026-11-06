@@ -4,6 +4,24 @@
 
 My build of Christian Selig's Caldera. Firmware is ZMK **v0.3**, built automatically by GitHub Actions on every push.
 
+### How keys are named in this README
+
+Each half is numbered on its own: **rows 1-5 from the top, columns 1-6 from the left** of that half.
+`L` = left half, `R` = right half. Example: **L R3C1** = Caps Lock, **R R3C2** = J.
+
+```
+            LEFT HALF                                RIGHT HALF
+        C1    C2    C3    C4    C5    C6        C1    C2    C3    C4    C5    C6
+  R1   Esc    1     2     3     4     5         6     7     8     9     0    Bksp
+  R2   Tab    Q     W     E     R     T         Y     U     I     O     P     '
+  R3   Caps   A     S     D     F     G         H     J     K     L     ;    Enter
+  R4   Shift  Z     X     C     V     B         N     M     ,     .     /    Shift
+  R5   Ctrl  Alt   Win   Home  Thumb Space     Space  Nav   Num   Alt   -    Menu
+```
+- **L R5C4 "Home"**: turns off any locked layer and returns to normal typing.
+- **L R5C5 "Thumb"**: hold = Numpad layer, tap = Layer Lock (applies to the next key only).
+- **R R5C2 "Nav"** and **R R5C3 "Num"**: hold for the layer, quick tap to lock it on.
+
 ### Updating the firmware
 
 **Step 1: Get the firmware files**
@@ -14,14 +32,17 @@ My build of Christian Selig's Caldera. Firmware is ZMK **v0.3**, built automatic
 
 **Step 2: Flash each half using keys (no reset button needed)**
 
-Both halves must be switched **on** and connected to each other, because the left half reads the keys for both.
+Only the half you're flashing needs a USB cable. The other half stays wireless.
+The left half is the keyboard's "brain": it reads the right half's key presses wirelessly and decides what every key does. So:
+- **Flashing the left half:** the left half must be on (the USB cable powers it).
+- **Flashing the right half:** the right half is plugged in, **and the left half must be switched on** (on battery, no cable needed). Otherwise nothing hears the right half's flashing key.
 
 1. Plug the half you're flashing into your computer with a USB cable.
-2. Tap the **left-thumb key** (bottom row, next to the left spacebar).
-3. Press **B**. This locks on the System layer.
+2. Tap **L R5C5** (Thumb). This starts Layer Lock.
+3. Press **L R4C6** (B). This locks on the System layer.
 4. Press the flashing key for the half that's plugged in:
-   - **Left half:** the top-left key (where Esc is)
-   - **Right half:** the top-right key (where Backspace is)
+   - **Left half:** **L R1C1** (Esc spot)
+   - **Right half:** **R R1C6** (Backspace spot)
 5. The half restarts and appears on your computer as a USB drive (named something like `NICENANO`).
 6. Drag that half's `.uf2` file onto the drive. It copies, ejects itself, and restarts with the new firmware. Windows may warn that the drive was removed unexpectedly. That's normal.
 7. Repeat for the other half.
@@ -39,7 +60,9 @@ Both halves must be switched **on** and connected to each other, because the lef
 
 ### Changing keys without flashing (ZMK Studio)
 1. Plug the **left** half in over USB and open https://zmk.studio in Chrome/Edge (or the desktop app).
-2. Unlock the keyboard: tap the left-thumb key (next to the left spacebar), press **B** (System layer), then press **Q**. If the keyboard is also connected over Bluetooth, press **U** on the System layer to send to USB. Press the "go home" key (4th from left, bottom row) to leave.
+2. Unlock the keyboard: tap **L R5C5** (Thumb), press **L R4C6** (B) for the System layer, then press **L R2C2** (Q).
+   If the keyboard is also connected over Bluetooth, press **R R2C2** (U) while on the System layer to send keystrokes over USB.
+   Press **L R5C4** (Home) to leave the System layer.
 3. Edit keys and save. Note that Studio edits are stored on the keyboard and override `config/caldera.keymap` until you choose "Restore Stock Settings" in Studio.
 
 ### Where things are
