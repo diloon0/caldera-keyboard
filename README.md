@@ -6,13 +6,13 @@ My build of Christian Selig's Caldera. Firmware is ZMK **v0.3**, built automatic
 
 **Updating the firmware**
 1. Push a change, open the **Actions** tab, and download the firmware zip from the latest successful run.
-2. Turn the half off, plug it in over USB, and double-tap its reset button. It shows up as a USB drive.
+2. Plug the half in over USB and put it in flashing mode: tap the left-thumb key (next to the left spacebar), press **B**, then press the top-left key (Esc spot) for the left half or the top-right key (Backspace spot) for the right half. (Double-tapping the physical reset button also works.) It shows up as a USB drive.
 3. Drag `caldera_left_studio.uf2` onto the left half, or `caldera_right-nice_nano_v2-zmk.uf2` onto the right half.
 4. If the halves won't talk to each other afterward, flash `settings_reset-nice_nano_v2-zmk.uf2` to both, then the normal files again, then turn both on and tap both reset buttons together.
 
 **Changing keys without flashing (ZMK Studio)**
 1. Plug the **left** half in over USB and open https://zmk.studio in Chrome/Edge (or the desktop app).
-2. Unlock the keyboard: hold the Numpad layer key (the *second* key right of the right spacebar) and press the key where **Q** normally is.
+2. Unlock the keyboard: tap the left-thumb key (next to the left spacebar), press **B** (System layer), then press **Q**. If the keyboard is also connected over Bluetooth, press **U** on the System layer to send to USB. Press the "go home" key (4th from left, bottom row) to leave.
 3. Edit keys and save. Note that Studio edits are stored on the keyboard and override `config/caldera.keymap` until you choose "Restore Stock Settings" in Studio.
 
 **Where things are**

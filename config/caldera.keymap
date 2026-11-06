@@ -1,21 +1,26 @@
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/outputs.h>
 #include <dt-bindings/zmk/pointing.h>
 
 // Layer numbers, by name. Use these names (not raw numbers) in bindings below,
 // so adding or reordering layers can't silently break a key.
-#define BASE     0
-#define NUMPAD   1
-#define NAV      2
-#define BT       3
-#define CC_TEST  4
-#define LOCK     5
+// Higher numbers sit "on top": their keys win over lower layers.
+#define BASE      0
+#define WORD      1   // word-delete mode (toggled on/off; sits just above Base)
+#define NUMPAD    2
+#define NAV       3
+#define SYS       4
+#define CC_TEST   5
+#define LOCK      6
+#define NAV_WORD  7   // turns on automatically when Nav + Word are both on
 
 / {
     macros {
         // Hold Alt and tap Tab (Alt+Tab window switcher); Alt is released when you let go
         specialtab: specialtab {
+            display-name = "Alt-Tab Hold";
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
             bindings =
@@ -27,15 +32,72 @@
                 <&macro_release>,
                 <&kp LEFT_ALT>;
         };
+
+        // "Go home": turn off every locked layer and return to normal typing,
+        // but leave word-delete mode as it was.
+        go_home: go_home {
+            display-name = "Go Home";
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <0>;
+            tap-ms = <0>;
+            bindings = <&macro_tap &tog_off NUMPAD &tog_off NAV &tog_off SYS &tog_off CC_TEST &tog_off LOCK>;
+        };
     };
 
     behaviors {
         // Hold = layer active while held (&mo). Tap = toggle the layer on/off (&tog).
         layer_mo_lock: layer_mo_lock {
+            display-name = "Hold Layer / Tap Lock";
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
             bindings = <&mo>, <&tog>;
             tapping-term-ms = <200>;
+        };
+
+        // Hold = layer active while held (&mo). Tap = one-shot layer (&sl).
+        // Used on the left-thumb key: hold for Numpad, tap for Layer Lock.
+        layer_mo_sticky: layer_mo_sticky {
+            display-name = "Hold Layer / Tap Sticky";
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            bindings = <&mo>, <&sl>;
+            tapping-term-ms = <200>;
+        };
+
+        // Turns a layer off (never on). Used by the "go home" key.
+        tog_off: toggle_layer_off_only {
+            compatible = "zmk,behavior-toggle-layer";
+            #binding-cells = <1>;
+            display-name = "Toggle Layer Off";
+            toggle-mode = "off";
+        };
+
+        // Backspace; with Shift held it sends Delete instead (Shift is not passed on)
+        bspc_del: backspace_delete {
+            display-name = "Bksp (Shift: Del)";
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp BSPC>, <&kp DEL>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        // Word-delete version: Ctrl+Backspace; with Shift held, Ctrl+Delete
+        word_bspc_del: word_backspace_delete {
+            display-name = "Word Bksp (Shift: Del)";
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp LC(BSPC)>, <&kp LC(DEL)>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+    };
+
+    // Nav + Word both on => Nav+Word layer on (makes Nav's Delete key delete whole words)
+    conditional_layers {
+        compatible = "zmk,conditional-layers";
+        nav_word {
+            if-layers = <WORD NAV>;
+            then-layer = <NAV_WORD>;
         };
     };
 
@@ -45,44 +107,60 @@
         default_layer {
             display-name = "Base";
             bindings = <
-&kp ESCAPE    &kp N1    &kp N2     &kp N3  &kp N4     &kp N5       &kp N6     &kp N7                   &kp N8                         &kp N9         &kp N0     &kp BSPC
-&kp TAB       &kp Q     &kp W      &kp E   &kp R      &kp T        &kp Y      &kp U                    &kp I                          &kp O          &kp P      &kp APOS
-&kp CAPSLOCK  &kp A     &kp S      &kp D   &kp F      &kp G        &kp H      &kp J                    &kp K                          &kp L          &kp SEMI   &kp RET
-&kp LSHFT     &kp Z     &kp X      &kp C   &kp V      &kp B        &kp N      &kp M                    &kp COMMA                      &kp DOT        &kp FSLH   &kp RIGHT_SHIFT
-&kp LCTRL     &kp LALT  &kp LMETA  &to 0   &sl LOCK   &kp SPACE    &kp SPACE  &layer_mo_lock NAV NAV   &layer_mo_lock NUMPAD NUMPAD   &kp RIGHT_ALT  &kp MINUS  &kp K_APP
+&kp ESCAPE    &kp N1    &kp N2     &kp N3    &kp N4                           &kp N5       &kp N6     &kp N7                   &kp N8                         &kp N9         &kp N0     &bspc_del
+&kp TAB       &kp Q     &kp W      &kp E     &kp R                            &kp T        &kp Y      &kp U                    &kp I                          &kp O          &kp P      &kp APOS
+&kp CAPSLOCK  &kp A     &kp S      &kp D     &kp F                            &kp G        &kp H      &kp J                    &kp K                          &kp L          &kp SEMI   &kp RET
+&kp LSHFT     &kp Z     &kp X      &kp C     &kp V                            &kp B        &kp N      &kp M                    &kp COMMA                      &kp DOT        &kp FSLH   &kp RIGHT_SHIFT
+&kp LCTRL     &kp LALT  &kp LMETA  &go_home  &layer_mo_sticky NUMPAD LOCK     &kp SPACE    &kp SPACE  &layer_mo_lock NAV NAV   &layer_mo_lock NUMPAD NUMPAD   &kp RIGHT_ALT  &kp MINUS  &kp K_APP
             >;
         };
 
+        // Word-delete mode: Backspace deletes the previous word (Ctrl+Backspace),
+        // Shift+Backspace deletes the next word. Toggle: Layer Lock, then Backspace.
+        word_delete {
+            display-name = "Word Delete";
+            bindings = <
+&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &word_bspc_del
+&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
+            >;
+        };
+
+        // Hold the left-thumb key (next to left space) or the 2nd key right of right space.
+        // Backspace here always deletes one character, even in word mode.
         num_pad {
             display-name = "Numpad";
             bindings = <
-&kp K_SLEEP       &none           &none  &none            &none             &none         &kp GRAVE  &kp SLASH     &kp ASTRK     &kp MINUS     &kp MINUS         &trans
-&kp C_SLEEP       &studio_unlock  &none  &kp PRINTSCREEN  &kp C_PLAY_PAUSE  &none         &kp PIPE   &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp PLUS          &kp BACKSLASH
-&kp C_SLEEP_MODE  &none           &none  &none            &kp LEFT_SHIFT    &none         &none      &kp NUMBER_4  &kp NUMBER_5  &kp NUMBER_6  &kp EQUAL         &trans
-&none             &none           &none  &kp SCROLLLOCK   &kp C_PREV        &kp C_NEXT    &none      &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp LEFT_BRACKET  &kp RIGHT_BRACKET
-&none             &none           &none  &trans           &trans            &none         &kp N0     &trans        &trans        &kp PERIOD    &kp LEFT_BRACE    &kp RIGHT_BRACE
+&none  &none  &none  &none  &none      &none        &kp GRAVE  &kp SLASH  &kp ASTRK  &kp MINUS   &kp COMMA         &bspc_del
+&none  &none  &none  &none  &none      &none        &kp PIPE   &kp N7     &kp N8     &kp N9      &kp PLUS          &kp BSLH
+&none  &none  &none  &none  &kp LSHFT  &none        &kp TAB    &kp N4     &kp N5     &kp N6      &kp EQUAL         &trans
+&none  &none  &none  &none  &none      &none        &none      &kp N1     &kp N2     &kp N3      &kp LEFT_BRACKET  &kp RIGHT_BRACKET
+&none  &none  &none  &trans &trans     &none        &kp N0     &kp N0     &trans     &kp PERIOD  &kp LEFT_BRACE    &kp RIGHT_BRACE
             >;
         };
 
         arrows_media {
             display-name = "Nav/Media";
             bindings = <
-&trans       &kp F1           &kp F2       &kp F3     &kp F4     &kp F5            &kp F6  &kp F7    &kp F8        &kp F9        &kp F10     &trans
-&specialtab  &kp RC(RS(TAB))  &kp RC(TAB)  &kp HOME   &kp END    &kp PAGE_UP       &none   &kp HOME  &kp UP        &kp END       &kp LC(S)   &kp DEL
-&none        &kp LC(A)        &kp LALT     &kp LSHFT  &kp LCTRL  &kp PAGE_DOWN     &none   &kp LEFT  &kp DOWN      &kp RIGHT     &kp F12     &trans
-&none        &kp RC(Z)        &kp RC(X)    &kp RC(C)  &kp RC(V)  &msc SCRL_UP      &none   &kp C_PP  &kp C_VOL_UP  &kp C_VOL_DN  &kp C_MUTE  &none
-&none        &none            &none        &trans     &trans     &msc SCRL_DOWN    &trans  &trans    &trans        &none         &none       &none
+&trans       &kp F1           &kp F2       &kp F3     &kp F4     &kp F5            &kp F6           &kp F7    &kp F8        &kp F9        &kp F10     &kp F11
+&specialtab  &kp RC(RS(TAB))  &kp RC(TAB)  &kp HOME   &kp END    &kp PAGE_UP       &kp PRINTSCREEN  &kp HOME  &kp UP        &kp END       &kp LC(S)   &kp DEL
+&caps_word   &kp LC(A)        &kp LALT     &kp LSHFT  &kp LCTRL  &kp PAGE_DOWN     &kp SCROLLLOCK   &kp LEFT  &kp DOWN      &kp RIGHT     &kp F12     &trans
+&none        &kp RC(Z)        &kp RC(X)    &kp RC(C)  &kp RC(V)  &msc SCRL_UP      &kp C_PREV       &kp C_PP  &kp C_VOL_UP  &kp C_VOL_DN  &kp C_MUTE  &kp C_NEXT
+&none        &none            &none        &trans     &trans     &msc SCRL_DOWN    &trans           &trans    &trans        &none         &none       &none
             >;
         };
 
-        bt_controls {
-            display-name = "Bluetooth";
+        // Reached with Layer Lock, then B. Everything here is deliberate-only.
+        system {
+            display-name = "System";
             bindings = <
-&none  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4    &none  &none  &none  &bt BT_CLR  &bt BT_CLR_ALL  &none
-&none  &none         &none         &none         &none         &none           &none  &none  &none  &none       &none           &none
-&none  &none         &none         &none         &none         &none           &none  &none  &none  &none       &none           &none
-&none  &none         &none         &none         &none         &none           &none  &none  &none  &none       &none           &none
-&none  &none         &none         &trans        &none         &none           &none  &none  &none  &none       &none           &none
+&bootloader       &bt BT_SEL 0    &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4    &none  &none        &none  &bt BT_CLR  &bt BT_CLR_ALL  &bootloader
+&kp K_SLEEP       &studio_unlock  &none         &none         &none         &none           &none  &out OUT_USB &none  &none       &none           &none
+&kp C_SLEEP       &none           &none         &none         &none         &none           &none  &none        &none  &none       &none           &none
+&kp C_SLEEP_MODE  &none           &none         &none         &none         &out OUT_BLE    &none  &none        &none  &none       &none           &none
+&none             &none           &none         &trans        &none         &none           &none  &none        &none  &none       &none           &none
             >;
         };
 
@@ -98,17 +176,31 @@
             >;
         };
 
-        // Reached by tapping the key next to the left spacebar (sticky: lasts for one keypress).
-        // Then press a key to lock a layer on: Q = HID Test, B = Bluetooth,
-        // right-side keys next to the spacebar = Nav/Media or Numpad.
+        // Reached by tapping the left-thumb key (next to left space): applies to the NEXT key only.
+        //   Backspace = word-delete mode on/off    Q = HID Test    B = System
+        //   Nav / Numpad keys (right of right space) = lock that layer on
+        // Any other key types normally.
         layer_lock {
             display-name = "Layer Lock";
             bindings = <
-&trans  &trans       &trans  &trans  &trans  &trans        &trans  &trans    &trans       &trans  &trans  &trans
-&trans  &tog CC_TEST &trans  &trans  &trans  &trans        &trans  &trans    &trans       &trans  &trans  &trans
-&trans  &trans       &trans  &trans  &trans  &trans        &trans  &trans    &trans       &trans  &trans  &trans
-&trans  &trans       &trans  &trans  &trans  &tog BT       &trans  &trans    &trans       &trans  &trans  &trans
-&trans  &trans       &trans  &trans  &trans  &trans        &trans  &tog NAV  &tog NUMPAD  &trans  &trans  &trans
+&trans  &trans        &trans  &trans  &trans  &trans        &trans  &trans    &trans       &trans  &trans  &tog WORD
+&trans  &tog CC_TEST  &trans  &trans  &trans  &trans        &trans  &trans    &trans       &trans  &trans  &trans
+&trans  &trans        &trans  &trans  &trans  &trans        &trans  &trans    &trans       &trans  &trans  &trans
+&trans  &trans        &trans  &trans  &trans  &tog SYS      &trans  &trans    &trans       &trans  &trans  &trans
+&trans  &trans        &trans  &trans  &trans  &trans        &trans  &tog NAV  &tog NUMPAD  &trans  &trans  &trans
+            >;
+        };
+
+        // Turns on by itself when Nav and Word Delete are both on:
+        // Nav's Delete key deletes the next word (Ctrl+Delete).
+        nav_word_delete {
+            display-name = "Nav+Word";
+            bindings = <
+&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &kp LC(DEL)
+&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
             >;
         };
 
