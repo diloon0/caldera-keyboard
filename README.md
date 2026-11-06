@@ -67,7 +67,7 @@ The left half is the keyboard's "brain": it reads the right half's key presses w
 
 ### Where things are
 - `config/caldera.keymap`: the keymap (layers and what each key does)
-- `config/boards/shields/caldera/caldera.conf`: settings for both halves (sleep, Bluetooth power, etc.)
+- `config/caldera.conf`: settings for both halves (sleep, Bluetooth power, etc.)
 - `config/boards/shields/caldera/caldera.dtsi`: wiring (which controller pins are rows/columns)
 - `config/boards/shields/caldera/caldera-layouts.dtsi`: key positions shown in ZMK Studio
 - `build.yaml`: which firmware files GitHub builds
