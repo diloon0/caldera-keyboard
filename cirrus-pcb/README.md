@@ -26,6 +26,24 @@ The right half is unchanged from the original Caldera design (`../ergogen/output
 
 Firmware: P0.08 HIGH = LED powered; LED data on P0.06 (Pro Micro pin 1).
 
+## Ordering from JLCPCB (left board only; the right half is unchanged)
+Files are in `jlcpcb/` (regenerate with `scripts\make_jlcpcb_files.py`):
+`cirrus_left_gerbers.zip`, `cirrus_left_bom.csv`, `cirrus_left_cpl.csv`.
+
+1. Upload `cirrus_left_gerbers.zip`. Keep: 2 layers, 1.6 mm thick, lead-free finish (HASL lead-free or ENIG).
+2. Turn on **PCB Assembly**: choose **Standard** PCBA (the LED is a "Standard only" part),
+   **Bottom** side, and the quantity to assemble (2 is enough for one keyboard plus a spare).
+   If JLCPCB asks about edge rails / process edges, accept: the LED sits right at the board edge.
+3. Upload `cirrus_left_bom.csv` and `cirrus_left_cpl.csv`.
+4. **Check the placement preview carefully** before paying. Part rotation conventions differ
+   between KiCad and JLCPCB, so fix any part that looks turned in their viewer:
+   - LED1: lens facing the board edge (the inner edge by the USB port)
+   - diodes D1-D30: the cathode band on the same end as the band in the board's printed diode symbol
+   - Q1, Q2: the single pin on the opposite side from the two pins, matching the pads
+   - B1 (reset), T1 (power switch): the button / slider facing the board edge
+5. Parts you solder yourself afterwards: 30 hot-swap sockets, the controller header strips,
+   and the JST battery connector (all large, easy joints).
+
 ## Known build note
 The hot-swap socket under the controller's GND/RST/VCC pins overlaps the controller's bottom
 header strip by 0.43 mm. File ~0.5 mm off the header strip's plastic edge there so it sits flat.
