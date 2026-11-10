@@ -1,0 +1,13 @@
+description: Switch between two Bluetooth profiles with one key
+
+compatible: "zmk,behavior-bt-profile-toggle"
+
+include: zero_param.yaml
+
+properties:
+  profile-a:
+    type: int
+    default: 0
+  profile-b:
+    type: int
+    default: 1

@@ -1,0 +1,7 @@
+# Makes this repo a Zephyr/ZMK module so it can add custom behaviors (src/behaviors/).
+# GitHub's ZMK build workflow detects this file and includes the module automatically.
+build:
+  cmake: .
+  kconfig: Kconfig
+  settings:
+    dts_root: .

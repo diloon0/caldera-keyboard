@@ -43,6 +43,85 @@
             tap-ms = <0>;
             bindings = <&macro_tap &tog_off NUMPAD &tog_off NAV &tog_off SYS &tog_off CC_TEST &tog_off LOCK>;
         };
+
+        // ---- Layer Lock actions ----
+        // A sticky layer only ends when a real character is typed, so a layer toggle
+        // pressed on Layer Lock would leave Layer Lock hanging around for a second.
+        // These macros do their job and then end Layer Lock right away.
+
+        // Toggle a layer on/off, then leave Layer Lock. Usage: &lock_tog WORD
+        lock_tog: lock_toggle_layer {
+            display-name = "Lock: Toggle Layer";
+            compatible = "zmk,behavior-macro-one-param";
+            #binding-cells = <1>;
+            wait-ms = <0>;
+            tap-ms = <0>;
+            bindings
+                = <&macro_param_1to1>
+                , <&macro_tap &tog MACRO_PLACEHOLDER>
+                , <&macro_tap &tog_off LOCK>
+                ;
+        };
+
+        // Leave Layer Lock and open the System layer for ONE action (5 s timeout)
+        lock_sys: lock_system_once {
+            display-name = "Lock: System Once";
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <0>;
+            tap-ms = <0>;
+            bindings = <&macro_tap &tog_off LOCK &sl_sys SYS>;
+        };
+
+        // Switch between Bluetooth profiles 1 and 2 (numbered 0 and 1 in ZMK), then leave Layer Lock
+        lock_bt_tog: lock_bt_toggle {
+            display-name = "Lock: BT 1/2 Toggle";
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <0>;
+            tap-ms = <0>;
+            bindings = <&macro_tap &bt_tog01 &tog_off LOCK>;
+        };
+
+        // ---- System layer actions: do the action, then close the System layer ----
+
+        // Usage: &sys_bt BT_SEL 0   or   &sys_bt BT_CLR
+        sys_bt: system_bluetooth {
+            display-name = "System: Bluetooth";
+            compatible = "zmk,behavior-macro-two-param";
+            #binding-cells = <2>;
+            wait-ms = <0>;
+            tap-ms = <0>;
+            bindings
+                = <&macro_param_1to1>
+                , <&macro_param_2to2>
+                , <&macro_tap &bt MACRO_PLACEHOLDER MACRO_PLACEHOLDER>
+                , <&macro_tap &tog_off SYS>
+                ;
+        };
+
+        // Usage: &sys_out OUT_USB
+        sys_out: system_output {
+            display-name = "System: Output";
+            compatible = "zmk,behavior-macro-one-param";
+            #binding-cells = <1>;
+            wait-ms = <0>;
+            tap-ms = <0>;
+            bindings
+                = <&macro_param_1to1>
+                , <&macro_tap &out MACRO_PLACEHOLDER>
+                , <&macro_tap &tog_off SYS>
+                ;
+        };
+
+        sys_unlock: system_studio_unlock {
+            display-name = "System: Studio Unlock";
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <0>;
+            tap-ms = <0>;
+            bindings = <&macro_tap &studio_unlock &tog_off SYS>;
+        };
     };
 
     behaviors {
@@ -63,6 +142,25 @@
             #binding-cells = <2>;
             bindings = <&mo>, <&sl>;
             tapping-term-ms = <200>;
+        };
+
+        // One-shot System layer: lasts for one keypress, or 5 seconds if nothing is pressed.
+        sl_sys: sticky_layer_system {
+            display-name = "Sticky Layer (5 s)";
+            compatible = "zmk,behavior-sticky-key";
+            #binding-cells = <1>;
+            release-after-ms = <5000>;
+            bindings = <&mo>;
+            quick-release;
+        };
+
+        // Custom behavior (src/behaviors/): flip between Bluetooth profiles 0 and 1.
+        bt_tog01: bt_profile_toggle {
+            display-name = "BT 1/2 Toggle";
+            compatible = "zmk,behavior-bt-profile-toggle";
+            #binding-cells = <0>;
+            profile-a = <0>;
+            profile-b = <1>;
         };
 
         // Turns a layer off (never on). Used by the "go home" key.
@@ -130,12 +228,13 @@
 
         // Hold the left-thumb key (next to left space) or the 2nd key right of right space.
         // Backspace here always deletes one character, even in word mode.
+        // Left home row: A/S/D = Bold / Italic / Underline (Ctrl+B / Ctrl+I / Ctrl+U)
         num_pad {
             display-name = "Numpad";
             bindings = <
-&none  &none  &none  &none  &none      &none        &kp GRAVE  &kp SLASH  &kp ASTRK  &kp MINUS   &kp COMMA         &bspc_del
-&none  &none  &none  &none  &none      &none        &kp PIPE   &kp N7     &kp N8     &kp N9      &kp PLUS          &kp BSLH
-&none  &none  &none  &none  &kp LSHFT  &none        &kp TAB    &kp N4     &kp N5     &kp N6      &kp EQUAL         &trans
+&none  &none      &none      &none      &none      &none        &kp GRAVE  &kp SLASH  &kp ASTRK  &kp MINUS   &kp COMMA         &bspc_del
+&none  &none      &none      &none      &none      &none        &kp PIPE   &kp N7     &kp N8     &kp N9      &kp PLUS          &kp BSLH
+&none  &kp LC(B)  &kp LC(I)  &kp LC(U)  &kp LSHFT  &none        &kp TAB    &kp N4     &kp N5     &kp N6      &kp EQUAL         &trans
 &none  &none  &none  &none  &none      &none        &none      &kp N1     &kp N2     &kp N3      &kp LEFT_BRACKET  &kp RIGHT_BRACKET
 &none  &none  &none  &trans &trans     &none        &kp N0     &kp N0     &trans     &kp PERIOD  &kp LEFT_BRACE    &kp RIGHT_BRACE
             >;
@@ -144,7 +243,7 @@
         arrows_media {
             display-name = "Nav/Media";
             bindings = <
-&trans       &kp F1           &kp F2       &kp F3     &kp F4     &kp F5            &kp F6           &kp F7    &kp F8        &kp F9        &kp F10     &kp F11
+&kp F11      &kp F1           &kp F2       &kp F3     &kp F4     &kp F5            &kp F6           &kp F7    &kp F8        &kp F9        &kp F10     &trans
 &specialtab  &kp RC(RS(TAB))  &kp RC(TAB)  &kp HOME   &kp END    &kp PAGE_UP       &kp PRINTSCREEN  &kp HOME  &kp UP        &kp END       &kp LC(S)   &kp DEL
 &caps_word   &kp LC(A)        &kp LALT     &kp LSHFT  &kp LCTRL  &kp PAGE_DOWN     &kp SCROLLLOCK   &kp LEFT  &kp DOWN      &kp RIGHT     &kp F12     &trans
 &none        &kp RC(Z)        &kp RC(X)    &kp RC(C)  &kp RC(V)  &msc SCRL_UP      &kp C_PREV       &kp C_PP  &kp C_VOL_UP  &kp C_VOL_DN  &kp C_MUTE  &kp C_NEXT
@@ -152,15 +251,16 @@
             >;
         };
 
-        // Reached with Layer Lock, then B. Everything here is deliberate-only.
+        // Reached with Layer Lock, then B. ONE action only: after any key (or 5 s), it closes itself.
+        // "Forget ALL devices" was removed; flash settings_reset if you ever truly need that.
         system {
             display-name = "System";
             bindings = <
-&bootloader       &bt BT_SEL 0    &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4    &none  &none        &none  &bt BT_CLR  &bt BT_CLR_ALL  &bootloader
-&kp K_SLEEP       &studio_unlock  &none         &none         &none         &none           &none  &out OUT_USB &none  &none       &none           &none
-&kp C_SLEEP       &none           &none         &none         &none         &none           &none  &none        &none  &none       &none           &none
-&kp C_SLEEP_MODE  &none           &none         &none         &none         &out OUT_BLE    &none  &none        &none  &none       &none           &none
-&none             &none           &none         &trans        &none         &none           &none  &none        &none  &none       &none           &none
+&bootloader       &sys_bt BT_SEL 0  &sys_bt BT_SEL 1  &sys_bt BT_SEL 2  &sys_bt BT_SEL 3  &sys_bt BT_SEL 4    &none  &none             &none  &sys_bt BT_CLR  &none  &bootloader
+&kp K_SLEEP       &sys_unlock       &none             &none             &none             &none                &none  &sys_out OUT_USB  &none  &none           &none  &none
+&kp C_SLEEP       &none             &none             &none             &none             &none                &none  &none             &none  &none           &none  &none
+&kp C_SLEEP_MODE  &none             &none             &none             &none             &sys_out OUT_BLE     &none  &none             &none  &none           &none  &none
+&none             &none             &none             &trans            &none             &none                &none  &none             &none  &none           &none  &none
             >;
         };
 
@@ -176,18 +276,20 @@
             >;
         };
 
-        // Reached by tapping the left-thumb key (next to left space): applies to the NEXT key only.
-        //   Backspace = word-delete mode on/off    Q = HID Test    B = System
+        // Reached by tapping the left-thumb key (next to left space): applies to the NEXT key only,
+        // and every action here ends Layer Lock immediately.
+        //   Backspace = word-delete mode on/off    Tab = switch Bluetooth device 1 <-> 2
+        //   Q = HID Test    B = System (one action)
         //   Nav / Numpad keys (right of right space) = lock that layer on
         // Any other key types normally.
         layer_lock {
             display-name = "Layer Lock";
             bindings = <
-&trans  &trans        &trans  &trans  &trans  &trans        &trans  &trans    &trans       &trans  &trans  &tog WORD
-&trans  &tog CC_TEST  &trans  &trans  &trans  &trans        &trans  &trans    &trans       &trans  &trans  &trans
-&trans  &trans        &trans  &trans  &trans  &trans        &trans  &trans    &trans       &trans  &trans  &trans
-&trans  &trans        &trans  &trans  &trans  &tog SYS      &trans  &trans    &trans       &trans  &trans  &trans
-&trans  &trans        &trans  &trans  &trans  &trans        &trans  &tog NAV  &tog NUMPAD  &trans  &trans  &trans
+&trans         &trans             &trans  &trans  &trans  &trans        &trans  &trans             &trans                &trans  &trans  &lock_tog WORD
+&lock_bt_tog   &lock_tog CC_TEST  &trans  &trans  &trans  &trans        &trans  &trans             &trans                &trans  &trans  &trans
+&trans         &trans             &trans  &trans  &trans  &trans        &trans  &trans             &trans                &trans  &trans  &trans
+&trans         &trans             &trans  &trans  &trans  &lock_sys     &trans  &trans             &trans                &trans  &trans  &trans
+&trans         &trans             &trans  &trans  &trans  &trans        &trans  &lock_tog NAV      &lock_tog NUMPAD      &trans  &trans  &trans
             >;
         };
 
