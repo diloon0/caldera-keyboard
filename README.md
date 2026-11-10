@@ -1,8 +1,12 @@
-# ⌨️ Caldera Keyboard
+# ⌨️ Cirrus Keyboard
 
-## This fork (diloon0)
+Cirrus is my split wireless keyboard, built from and evolved out of Christian Selig's
+[Caldera](https://github.com/christianselig/caldera-keyboard) (MIT license; his original README is below).
+Firmware is ZMK **v0.3**, built automatically by GitHub Actions on every push.
 
-My build of Christian Selig's Caldera. Firmware is ZMK **v0.3**, built automatically by GitHub Actions on every push.
+- Firmware: `config/` (shield name `cirrus_left` / `cirrus_right`, Bluetooth name "Cirrus")
+- Left PCB with status LED: `cirrus-pcb/` (see its README)
+- Original Caldera design files (Ergogen, KiCad, gerbers): `ergogen/`
 
 ### How keys are named in this README
 
@@ -27,8 +31,8 @@ Each half is numbered on its own: **rows 1-5 from the top, columns 1-6 from the 
 **Step 1: Get the firmware files**
 1. On GitHub, open the **Actions** tab and click the latest run with a green check mark.
 2. Scroll down to **Artifacts**, download the firmware zip, and unzip it. You'll use:
-   - `caldera_left_studio.uf2` for the left half
-   - `caldera_right-nice_nano_v2-zmk.uf2` for the right half
+   - `cirrus_left_studio.uf2` for the left half
+   - `cirrus_right-nice_nano_v2-zmk.uf2` for the right half
 
 **Step 2: Flash each half using keys (no reset button needed)**
 
@@ -64,13 +68,13 @@ The left half is the keyboard's "brain": it reads the right half's key presses w
 3. Unlock the keyboard: tap **L R5C5** (Thumb), press **L R4C6** (B), then press **L R2C2** (Q).
    (The System layer closes itself after each action, so each one starts with Thumb, B.)
 4. To go back to Bluetooth later: Thumb, B, then **L R4C6** (B) again.
-5. Edit keys and save. Note that Studio edits are stored on the keyboard and override `config/caldera.keymap` until you choose "Restore Stock Settings" in Studio.
+5. Edit keys and save. Note that Studio edits are stored on the keyboard and override `config/cirrus.keymap` until you choose "Restore Stock Settings" in Studio.
 
 ### Where things are
-- `config/caldera.keymap`: the keymap (layers and what each key does)
-- `config/caldera.conf`: settings for both halves (sleep, Bluetooth power, etc.)
-- `config/boards/shields/caldera/caldera.dtsi`: wiring (which controller pins are rows/columns)
-- `config/boards/shields/caldera/caldera-layouts.dtsi`: key positions shown in ZMK Studio
+- `config/cirrus.keymap`: the keymap (layers and what each key does)
+- `config/cirrus.conf`: settings for both halves (sleep, Bluetooth power, etc.)
+- `config/boards/shields/cirrus/cirrus.dtsi`: wiring (which controller pins are rows/columns)
+- `config/boards/shields/cirrus/cirrus-layouts.dtsi`: key positions shown in ZMK Studio
 - `build.yaml`: which firmware files GitHub builds
 
 ### Pin reference
@@ -84,7 +88,7 @@ ZMK uses Pro Micro numbers; Ergogen/KiCad use nice!nano names.
 
 ---
 
-## Original README
+## Original Caldera README (by Christian Selig)
 
 This repo contains:
 

@@ -1,4 +1,4 @@
-#include "caldera.dtsi"
+#include "cirrus.dtsi"
 
 &kscan0 {
     col-gpios

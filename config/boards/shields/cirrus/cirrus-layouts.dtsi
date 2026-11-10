@@ -1,15 +1,15 @@
 /*
- * Physical layout of the Caldera: where each key sits, for ZMK Studio's on-screen keyboard.
+ * Physical layout of the Cirrus: where each key sits, for ZMK Studio's on-screen keyboard.
  * Units are 1/100th of a key width. Order matches the keymap (left to right, top to bottom).
- * Generated from config/caldera.json (left half x=0-500, right half x=900-1400).
+ * Generated from config/cirrus.json (left half x=0-500, right half x=900-1400).
  */
 
 #include <physical_layouts.dtsi>
 
 / {
-    caldera_layout: caldera_layout {
+    cirrus_layout: cirrus_layout {
         compatible = "zmk,physical-layout";
-        display-name = "Caldera";
+        display-name = "Cirrus";
         keys  //                     w   h     x    y  rot  rx  ry
             = <&key_physical_attrs 100 100     0   40    0   0   0>
             , <&key_physical_attrs 100 100   100   40    0   0   0>

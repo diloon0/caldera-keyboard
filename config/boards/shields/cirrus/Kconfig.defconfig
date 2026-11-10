@@ -1,14 +1,14 @@
-if SHIELD_CALDERA_LEFT
+if SHIELD_CIRRUS_LEFT
 
 config ZMK_KEYBOARD_NAME
-    default "Caldera"
+    default "Cirrus"
 
 config ZMK_SPLIT_ROLE_CENTRAL
     default y
 
 endif
 
-if SHIELD_CALDERA_LEFT || SHIELD_CALDERA_RIGHT
+if SHIELD_CIRRUS_LEFT || SHIELD_CIRRUS_RIGHT
 
 config ZMK_SPLIT
     default y

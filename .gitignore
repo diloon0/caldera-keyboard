@@ -1,1 +1,7 @@
 .DS_Store
+
+# KiCad per-user/local files
+*.kicad_prl
+*-backups/
+fp-info-cache
+*.drc.json

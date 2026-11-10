@@ -1,20 +1,20 @@
 #include <dt-bindings/zmk/matrix_transform.h>
-#include "caldera-layouts.dtsi"
+#include "cirrus-layouts.dtsi"
 
 // Tell the physical layout (used by ZMK Studio) which matrix transform to use
-&caldera_layout {
+&cirrus_layout {
     transform = <&default_transform>;
 };
 
 / {
     chosen {
         zmk,kscan = &kscan0;
-        zmk,physical-layout = &caldera_layout;
+        zmk,physical-layout = &cirrus_layout;
     };
 
     // Maps each physical switch (row, column) to a position in the keymap.
     // 5 rows x 12 columns = 60 keys. The right half's columns are shifted by 6
-    // (see col-offset in caldera_right.overlay).
+    // (see col-offset in cirrus_right.overlay).
     default_transform: keymap_transform_0 {
         compatible = "zmk,matrix-transform";
         columns = <12>;
@@ -48,6 +48,6 @@ RC(4,0) RC(4,1) RC(4,2) RC(4,3) RC(4,4) RC(4,5)                 RC(4,6) RC(4,7) 
             , <&pro_micro 18 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // Row D
             , <&pro_micro 15 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // Row E (modifier row)
             ;
-        // col-gpios are set per half in caldera_left.overlay / caldera_right.overlay
+        // col-gpios are set per half in cirrus_left.overlay / cirrus_right.overlay
     };
 };

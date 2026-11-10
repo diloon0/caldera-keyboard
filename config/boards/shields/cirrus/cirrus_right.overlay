@@ -1,4 +1,4 @@
-#include "caldera.dtsi"
+#include "cirrus.dtsi"
 
 &default_transform { 
     col-offset = <6>;

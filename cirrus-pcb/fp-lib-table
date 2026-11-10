@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "cirrus")(type "KiCad")(uri "${KIPRJMOD}/cirrus.pretty")(options "")(descr "Cirrus keyboard custom footprints"))
+)
