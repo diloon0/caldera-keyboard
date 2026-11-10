@@ -39,7 +39,7 @@ The left half is the keyboard's "brain": it reads the right half's key presses w
 
 1. Plug the half you're flashing into your computer with a USB cable.
 2. Tap **L R5C5** (Thumb). This starts Layer Lock.
-3. Press **L R4C6** (B). This locks on the System layer.
+3. Press **L R4C6** (B). This opens the System layer for **one** action. You have 5 seconds to press the next key before it closes itself.
 4. Press the flashing key for the half that's plugged in:
    - **Left half:** **L R1C1** (Esc spot)
    - **Right half:** **R R1C6** (Backspace spot)
@@ -60,10 +60,11 @@ The left half is the keyboard's "brain": it reads the right half's key presses w
 
 ### Changing keys without flashing (ZMK Studio)
 1. Plug the **left** half in over USB and open https://zmk.studio in Chrome/Edge (or the desktop app).
-2. Unlock the keyboard: tap **L R5C5** (Thumb), press **L R4C6** (B) for the System layer, then press **L R2C2** (Q).
-   If the keyboard is also connected over Bluetooth, press **R R2C2** (U) while on the System layer to send keystrokes over USB.
-   Press **L R5C4** (Home) to leave the System layer.
-3. Edit keys and save. Note that Studio edits are stored on the keyboard and override `config/caldera.keymap` until you choose "Restore Stock Settings" in Studio.
+2. If the keyboard is also connected over Bluetooth, first send keystrokes over USB: tap **L R5C5** (Thumb), press **L R4C6** (B), then press **R R2C2** (U).
+3. Unlock the keyboard: tap **L R5C5** (Thumb), press **L R4C6** (B), then press **L R2C2** (Q).
+   (The System layer closes itself after each action, so each one starts with Thumb, B.)
+4. To go back to Bluetooth later: Thumb, B, then **L R4C6** (B) again.
+5. Edit keys and save. Note that Studio edits are stored on the keyboard and override `config/caldera.keymap` until you choose "Restore Stock Settings" in Studio.
 
 ### Where things are
 - `config/caldera.keymap`: the keymap (layers and what each key does)
