@@ -1,0 +1,74 @@
+description: |
+  Cirrus status light: one SK6812/WS2812-style LED.
+
+  What it shows, most important first:
+    1. Short signals (played one after another, never cutting each other off):
+       Bluetooth profile switch (blinks = profile number), battery check at power-on/wake,
+       low-battery reminders every 30 s while typing (left half: 1 blink, right: 2 fast).
+    2. The highest active layer that has a color (except the "below-caps" layers).
+    3. Caps Lock.
+    4. The "below-caps" layers (e.g. word-delete mode).
+  Nothing to show = LED power switched off completely.
+
+  Colors are 0xRRGGBB at full strength; "brightness" scales all of them down.
+  A color of 0 means "show nothing for this".
+
+compatible: "zmk,cirrus-status-led"
+
+properties:
+  led-strip:
+    type: phandle
+    required: true
+    description: The worldsemi,ws2812-spi node that drives the LED.
+
+  power-gpios:
+    type: phandle-array
+    description: Pin that switches the LED's power on (active) and off. Optional.
+
+  brightness:
+    type: int
+    default: 12
+    description: Overall brightness in percent (1-100).
+
+  caps-lock-color:
+    type: int
+    default: 0xFFFFFF
+
+  layer-colors:
+    type: array
+    description: |
+      One color per layer, in keymap order (layer 0 first). Layers past the end of the
+      list have no color.
+
+  below-caps-layers:
+    type: array
+    description: Layer numbers that rank below Caps Lock instead of above it.
+
+  bt-profile-color:
+    type: int
+    default: 0x0000FF
+    description: Blinks once for Bluetooth profile 1, twice for profile 2, and so on.
+
+  battery-good-color:
+    type: int
+    default: 0x00FF00
+    description: Battery check color above 50%.
+
+  battery-medium-color:
+    type: int
+    default: 0xFFB000
+    description: Battery check color between the low-battery level and 50%.
+
+  low-battery-percent:
+    type: int
+    default: 15
+
+  low-battery-color:
+    type: int
+    default: 0xFF0000
+
+  idle-off:
+    type: boolean
+    description: |
+      Turn the steady colors off when the keyboard goes idle (about 30 s without a
+      keypress). They come back on the next keypress. Saves battery.

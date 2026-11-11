@@ -3,3 +3,15 @@ config ZMK_BEHAVIOR_BT_PROFILE_TOGGLE
     default y
     depends on DT_HAS_ZMK_BEHAVIOR_BT_PROFILE_TOGGLE_ENABLED
     depends on ZMK_BLE
+
+# Status light (left half only: it's switched on by the status_led node in cirrus_left.overlay)
+config ZMK_CIRRUS_STATUS_LED
+    bool
+    default y
+    depends on DT_HAS_ZMK_CIRRUS_STATUS_LED_ENABLED
+    select LED_STRIP
+    select WS2812_STRIP
+    select SPI
+    # Ask the computer for its Caps Lock state (changes the Bluetooth/USB description:
+    # re-pair the keyboard once after flashing)
+    select ZMK_HID_INDICATORS

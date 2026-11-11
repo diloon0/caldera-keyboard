@@ -11,3 +11,77 @@
         ;
 };
 
+
+/*
+ * ---- Status light (Cirrus left PCB) ----
+ * SK6812 side-light LED. Data on Pro Micro pin 1 (P0.06); power switched by pin 0 (P0.08,
+ * high = on). On the original Caldera board these pins aren't connected, so this is harmless.
+ */
+#include <dt-bindings/led/led.h>
+
+&pinctrl {
+    spi3_default: spi3_default {
+        group1 {
+            psels = <NRF_PSEL(SPIM_MOSI, 0, 6)>;
+        };
+    };
+
+    spi3_sleep: spi3_sleep {
+        group1 {
+            psels = <NRF_PSEL(SPIM_MOSI, 0, 6)>;
+            low-power-enable;
+        };
+    };
+};
+
+&spi3 {
+    compatible = "nordic,nrf-spim";
+    status = "okay";
+    pinctrl-0 = <&spi3_default>;
+    pinctrl-1 = <&spi3_sleep>;
+    pinctrl-names = "default", "sleep";
+
+    status_led_strip: ws2812@0 {
+        compatible = "worldsemi,ws2812-spi";
+        reg = <0>;
+        spi-max-frequency = <4000000>;
+        chain-length = <1>;
+        spi-one-frame = <0x70>;
+        spi-zero-frame = <0x40>;
+        reset-delay = <80>;  // SK6812 needs > 80 us to latch
+        // If colors come out swapped (e.g. red shows as green), change this order.
+        color-mapping = <LED_COLOR_ID_GREEN LED_COLOR_ID_RED LED_COLOR_ID_BLUE>;
+    };
+};
+
+/ {
+    // What each color means and the order they win in: dts/bindings/zmk,cirrus-status-led.yaml
+    // Colors are 0xRRGGBB at full strength; 0 = no light.
+    status_led {
+        compatible = "zmk,cirrus-status-led";
+        led-strip = <&status_led_strip>;
+        power-gpios = <&pro_micro 0 GPIO_ACTIVE_HIGH>;
+        brightness = <12>;                  // percent
+
+        layer-colors = <
+            0           // 0 Base:            off
+            0xFF5000    // 1 Word-delete:     orange (ranks below Caps Lock, see below)
+            0x00FF00    // 2 Numpad:          green
+            0xFFD000    // 3 Nav:             yellow
+            0x00FFFF    // 4 System:          cyan
+            0x8000FF    // 5 HID Test:        purple
+            0xFF00FF    // 6 Layer Lock:      magenta
+            0           // 7 Nav + Word:      (shows Nav's yellow)
+        >;
+        below-caps-layers = <1>;            // Word-delete ranks below Caps Lock
+        caps-lock-color = <0xFFFFFF>;       // white
+
+        bt-profile-color = <0x0000FF>;      // blue blinks: 1 = profile 1, 2 = profile 2
+        battery-good-color = <0x00FF00>;    // power-on check, above 50%: green
+        battery-medium-color = <0xFFB000>;  // 15-50%: yellow
+        low-battery-color = <0xFF0000>;     // below 15%: red (left = 1 blink, right = 2 fast)
+        low-battery-percent = <15>;
+
+        idle-off;                           // steady colors off after ~30 s without typing
+    };
+};

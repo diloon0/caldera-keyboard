@@ -6,6 +6,11 @@ config ZMK_KEYBOARD_NAME
 config ZMK_SPLIT_ROLE_CENTRAL
     default y
 
+# Let the left half read the right half's battery level (used by the status light's
+# low-battery warning)
+config ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING
+    default y
+
 endif
 
 if SHIELD_CIRRUS_LEFT || SHIELD_CIRRUS_RIGHT
