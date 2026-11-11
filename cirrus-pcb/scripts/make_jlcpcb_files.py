@@ -1,10 +1,12 @@
-"""Make the JLCPCB order files for the Cirrus left board.
+"""Make the JLCPCB order files for a Cirrus board (left or right).
 Run with KiCad's Python from the cirrus-pcb folder:
-  "C:\\Program Files\\KiCad\\10.0\\bin\\python.exe" scripts\\make_jlcpcb_files.py
-Outputs (in jlcpcb/):
-  cirrus_left_gerbers.zip   board layers + drill files (upload as the PCB)
-  cirrus_left_bom.csv       parts list with JLCPCB part numbers
-  cirrus_left_cpl.csv       placement file (position, rotation, side of every assembled part)
+  "C:\\Program Files\\KiCad\\10.0\\bin\\python.exe" scripts\\make_jlcpcb_files.py left
+  "C:\\Program Files\\KiCad\\10.0\\bin\\python.exe" scripts\\make_jlcpcb_files.py right
+Outputs (in jlcpcb/; SIDE = left or right):
+  cirrus_SIDE_gerbers.zip   board layers + drill files (upload as the PCB)
+  cirrus_SIDE_bom.csv       parts list with JLCPCB part numbers
+  cirrus_SIDE_cpl.csv       placement file (position, rotation, side of every assembled part)
+  gerbers_SIDE/             the same gerbers unzipped, for looking at
 Parts NOT assembled by JLCPCB (you solder them): hot-swap sockets S1-S30, controller sockets
 (MCU1), battery connector JST1."""
 import os, sys, csv, shutil, subprocess, zipfile, pcbnew
@@ -13,7 +15,10 @@ import match_parts
 
 KICAD_CLI = r"C:\Program Files\KiCad\10.0\bin\kicad-cli.exe"
 ROOT = os.path.dirname(HERE)
-BOARD = os.path.join(ROOT, "cirrus_left.kicad_pcb")
+SIDE = sys.argv[1] if len(sys.argv) > 1 else "left"
+if SIDE not in ("left", "right"): raise SystemExit("usage: make_jlcpcb_files.py left|right")
+NAME = "cirrus_" + SIDE
+BOARD = os.path.join(ROOT, NAME + ".kicad_pcb")
 OUT = os.path.join(ROOT, "jlcpcb")
 
 # What JLCPCB places, keyed by reference prefix/name -> (comment, JLCPCB part #)
@@ -40,8 +45,9 @@ def run(*args):
         print(r.stdout, r.stderr); raise SystemExit("kicad-cli failed: " + " ".join(args))
 
 def main():
-    if os.path.isdir(OUT): shutil.rmtree(OUT)
-    gdir = os.path.join(OUT, "gerbers"); os.makedirs(gdir)
+    gdir = os.path.join(OUT, "gerbers_" + SIDE)   # only this side's files are replaced
+    if os.path.isdir(gdir): shutil.rmtree(gdir)
+    os.makedirs(gdir)
 
     # 1) Gerbers + drill (JLCPCB's recommended KiCad settings)
     run("pcb", "export", "gerbers", "-o", gdir + os.sep,
@@ -49,7 +55,7 @@ def main():
         "--subtract-soldermask", "--no-x2", "--no-netlist", BOARD)
     run("pcb", "export", "drill", "-o", gdir + os.sep, "--format", "excellon", "--excellon-units", "mm",
         "--excellon-zeros-format", "decimal", "--excellon-oval-format", "alternate", BOARD)
-    zpath = os.path.join(OUT, "cirrus_left_gerbers.zip")
+    zpath = os.path.join(OUT, NAME + "_gerbers.zip")
     with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
         for f in sorted(os.listdir(gdir)):
             z.write(os.path.join(gdir, f), f)
@@ -81,7 +87,7 @@ def main():
             p = part_for(r["Ref"])
             if p is None: continue           # not assembled by JLCPCB
             rows.append(r)
-    with open(os.path.join(OUT, "cirrus_left_cpl.csv"), "w", newline="", encoding="utf-8") as f:
+    with open(os.path.join(OUT, NAME + "_cpl.csv"), "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f); w.writerow(["Designator", "Mid X", "Mid Y", "Layer", "Rotation"])
         for r in sorted(rows, key=lambda r: (r["Ref"].rstrip("0123456789"), int("0" + "".join(ch for ch in r["Ref"] if ch.isdigit())))):
             w.writerow([r["Ref"], f'{float(r["PosX"]):.4f}mm', f'{float(r["PosY"]):.4f}mm',
@@ -93,7 +99,7 @@ def main():
         comment, lcsc = part_for(r["Ref"])
         g = groups.setdefault(lcsc, {"comment": comment, "refs": [], "pkg": r["Package"]})
         g["refs"].append(r["Ref"])
-    with open(os.path.join(OUT, "cirrus_left_bom.csv"), "w", newline="", encoding="utf-8") as f:
+    with open(os.path.join(OUT, NAME + "_bom.csv"), "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f); w.writerow(["Comment", "Designator", "Footprint", "JLCPCB Part #"])
         for lcsc, g in groups.items():
             refs = sorted(g["refs"], key=lambda s: (s.rstrip("0123456789"), int("0" + "".join(ch for ch in s if ch.isdigit()))))
@@ -102,7 +108,7 @@ def main():
     for f in (tmp, pos): os.remove(f)
     for f in os.listdir(OUT):
         if f.startswith("_placement_tmp"): os.remove(os.path.join(OUT, f))
-    print("wrote", sorted(os.listdir(OUT)))
+    print("wrote", sorted(f for f in os.listdir(OUT) if SIDE in f))
     print("assembled parts:", len(rows), "| BOM lines:", len(groups))
 
 if __name__ == "__main__":
