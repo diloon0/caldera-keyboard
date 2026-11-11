@@ -48,7 +48,8 @@ Files are in `jlcpcb/` (regenerate with `scripts\make_jlcpcb_files.py left` or `
    - diodes D1-D30: the cathode band on the same end as the band in the board's printed diode symbol
    - Q1, Q2 (left only): the single pin on the opposite side from the two pins, matching the pads
    - B1 (reset), T1 (power switch): the button / slider facing the board edge. On the left order
-     both needed turning in JLCPCB's viewer, so expect the same on the right.
+     both needed turning in JLCPCB's viewer. Right board (checked 2026-11-10): rotate B1 and T1
+     "left" once (90 degrees) each; then the slider and button stick out past the board edge.
 5. Parts you solder yourself afterwards: 30 hot-swap sockets, the controller header strips,
    and the JST battery connector (all large, easy joints).
 
