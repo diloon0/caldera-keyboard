@@ -5,7 +5,7 @@ Cirrus is my split wireless keyboard, built from and evolved out of Christian Se
 Firmware is ZMK **v0.3**, built automatically by GitHub Actions on every push.
 
 - Firmware: `config/` (shield name `cirrus_left` / `cirrus_right`, Bluetooth name "Cirrus")
-- Left PCB with status LED: `cirrus-pcb/` (see its README)
+- PCBs for both halves, ready to order from JLCPCB: `cirrus-pcb/` (the left board adds a status light; see its README)
 - Original Caldera design files (Ergogen, KiCad, gerbers): `ergogen/`
 
 ### How keys are named in this README
@@ -70,12 +70,29 @@ The left half is the keyboard's "brain": it reads the right half's key presses w
 4. To go back to Bluetooth later: Thumb, B, then **L R4C6** (B) again.
 5. Edit keys and save. Note that Studio edits are stored on the keyboard and override `config/cirrus.keymap` until you choose "Restore Stock Settings" in Studio.
 
+### Status light (Cirrus left PCB)
+A small side light on the left half's inner edge. Most important first:
+1. **Short signals** (queued, never cut each other off): blue blinks when switching Bluetooth profile
+   (1 blink = profile 1, 2 = profile 2); a 1-second battery check at power-on/wake (green > 50%,
+   yellow, red < 15%); low-battery reminders every 30 s while typing (left half: 1 red blink,
+   right half: 2 fast red blinks).
+2. **Layers**: Layer Lock magenta, System cyan, Nav yellow, Numpad green, HID Test purple.
+3. **Caps Lock**: white.
+4. **Word-delete mode**: orange.
+
+Otherwise the light's power is switched off. Steady colors also turn off after ~30 s without typing.
+Colors and brightness: the `status_led` section at the end of `config/boards/shields/cirrus/cirrus_left.overlay`.
+After first flashing firmware with the light, remove and re-pair the keyboard on each computer
+(it now asks the computer for the Caps Lock state, which changes how it describes itself).
+
 ### Where things are
 - `config/cirrus.keymap`: the keymap (layers and what each key does)
 - `config/cirrus.conf`: settings for both halves (sleep, Bluetooth power, etc.)
 - `config/boards/shields/cirrus/cirrus.dtsi`: wiring (which controller pins are rows/columns)
 - `config/boards/shields/cirrus/cirrus-layouts.dtsi`: key positions shown in ZMK Studio
 - `build.yaml`: which firmware files GitHub builds
+- `src/`, `dts/bindings/`, `zephyr/`, `CMakeLists.txt`, `Kconfig`: custom firmware code (status light,
+  Bluetooth profile toggle). These make the repo a ZMK module, which the GitHub build picks up automatically.
 
 ### Pin reference
 ZMK uses Pro Micro numbers; Ergogen/KiCad use nice!nano names.
@@ -84,7 +101,9 @@ ZMK uses Pro Micro numbers; Ergogen/KiCad use nice!nano names.
 |---|---|---|
 | 2, 3, 4, 5, 6, 7 | P0.17, P0.20, P0.22, P0.24, P1.00, P0.11 | Columns |
 | 21, 20, 19, 18, 15 | P0.31, P0.29, P0.02, P1.15, P1.13 | Rows (number row to bottom row) |
-| 0, 1, 8, 9, 10, 14, 16 | P0.08, P0.06, P1.04, P1.06, P0.09, P1.11, P0.10 | **Free** (not connected on the PCB) |
+| 0 | P0.08 | Status light power on/off (Cirrus left PCB only) |
+| 1 | P0.06 | Status light data (Cirrus left PCB only) |
+| 8, 9, 10, 14, 16 | P1.04, P1.06, P0.09, P1.11, P0.10 | **Free** (not connected on the PCB) |
 
 ---
 
