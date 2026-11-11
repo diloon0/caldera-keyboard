@@ -16,10 +16,9 @@ switch so the firmware can cut the LED's power during sleep. The printed board t
 `cirrus_right.kicad_pcb` is the original Caldera right board (`../ergogen/output/pcbs/right_finished.kicad_pcb`)
 with only the printed name changed to "Cirrus". No LED (the light lives on the left half).
 `base/right_v1_kicad10.kicad_pcb` is the untouched original in KiCad 10 format. Rebuild with:
-`"C:\Program Files\KiCad.0in\python.exe" scripts\make_right_board.py ..\ergogen\output\pcbs
-ight_finished.kicad_pcb`
+`"C:\Program Files\KiCad\10.0\bin\python.exe" scripts\make_right_board.py ..\ergogen\output\pcbs\right_finished.kicad_pcb`
 
-## New parts (all on the back, all assembled by JLCPCB)
+## New parts on the left board (all on the back, all assembled by JLCPCB)
 | Ref | Part | JLCPCB # | Job |
 |---|---|---|---|
 | LED1 | SK6812SIDE-A-RVS | C2890037 | status LED, data from P0.06 |
