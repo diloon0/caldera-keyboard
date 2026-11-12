@@ -91,8 +91,9 @@ After first flashing firmware with the light, remove and re-pair the keyboard on
 - `config/boards/shields/cirrus/cirrus.dtsi`: wiring (which controller pins are rows/columns)
 - `config/boards/shields/cirrus/cirrus-layouts.dtsi`: key positions shown in ZMK Studio
 - `build.yaml`: which firmware files GitHub builds
-- `keymap-sheet/cirrus-keymap.pdf`: printable picture of every layer. After changing the keymap, run
-  `python keymap-sheet/make_keymap_sheet.py` to redraw it (needs only Python, plus Edge or Chrome for the PDF)
+- `keymap-sheet/`: printable picture of every layer. GitHub redraws it on every push: download
+  **keymap-sheet** from the same Artifacts list as the firmware. (To redraw it on your own computer:
+  `python keymap-sheet/make_keymap_sheet.py`, which needs Python plus Edge or Chrome.)
 - `src/`, `dts/bindings/`, `zephyr/`, `CMakeLists.txt`, `Kconfig`: custom firmware code (status light,
   Bluetooth profile toggle). These make the repo a ZMK module, which the GitHub build picks up automatically.
 
