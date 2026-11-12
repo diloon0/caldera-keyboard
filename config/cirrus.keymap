@@ -16,6 +16,19 @@
 #define LOCK      6
 #define NAV_WORD  7   // turns on automatically when Nav + Word are both on
 
+// Numpad digit that types a normal digit, but a KEYPAD digit while Alt is held, so Windows
+// Alt codes work (hold Alt, type e.g. 0176, let go of Alt: °). Alt stays held (keep-mods).
+// (MOD_MORPH_0 holds the "#binding-cells" line: a "#" can't appear directly inside ALT_CODE_DIGIT)
+#define MOD_MORPH_0 compatible = "zmk,behavior-mod-morph"; #binding-cells = <0>
+#define ALT_CODE_DIGIT(name, n) \
+    name: name { \
+        MOD_MORPH_0; \
+        display-name = "Digit (Alt: keypad)"; \
+        bindings = <&kp N##n>, <&kp KP_N##n>; \
+        mods = <(MOD_LALT|MOD_RALT)>; \
+        keep-mods = <(MOD_LALT|MOD_RALT)>; \
+    };
+
 / {
     macros {
         // Hold Alt and tap Tab (Alt+Tab window switcher); Alt is released when you let go
@@ -180,6 +193,11 @@
             mods = <(MOD_LSFT|MOD_RSFT)>;
         };
 
+        // Numpad digits 0-9 (see ALT_CODE_DIGIT at the top)
+        ALT_CODE_DIGIT(ac0, 0) ALT_CODE_DIGIT(ac1, 1) ALT_CODE_DIGIT(ac2, 2) ALT_CODE_DIGIT(ac3, 3)
+        ALT_CODE_DIGIT(ac4, 4) ALT_CODE_DIGIT(ac5, 5) ALT_CODE_DIGIT(ac6, 6) ALT_CODE_DIGIT(ac7, 7)
+        ALT_CODE_DIGIT(ac8, 8) ALT_CODE_DIGIT(ac9, 9)
+
         // Word-delete version: Ctrl+Backspace; with Shift held, Ctrl+Delete
         word_bspc_del: word_backspace_delete {
             display-name = "Word Bksp (Shift: Del)";
@@ -229,14 +247,16 @@
         // Hold the left-thumb key (next to left space) or the 2nd key right of right space.
         // Backspace here always deletes one character, even in word mode.
         // Left home row: A/S/D = Bold / Italic / Underline (Ctrl+B / Ctrl+I / Ctrl+U)
+        // Alt in its usual spot + digits that switch to keypad digits while Alt is held = Alt codes.
+        // Num Lock (Esc spot): Alt codes need it on; if a code moves the cursor instead, tap it.
         num_pad {
             display-name = "Numpad";
             bindings = <
-&none  &none      &none      &none      &none      &none        &kp GRAVE  &kp SLASH  &kp ASTRK  &kp MINUS   &kp COMMA         &bspc_del
-&none  &none      &none      &none      &none      &none        &kp PIPE   &kp N7     &kp N8     &kp N9      &kp PLUS          &kp BSLH
-&none  &kp LC(B)  &kp LC(I)  &kp LC(U)  &kp LSHFT  &none        &kp TAB    &kp N4     &kp N5     &kp N6      &kp EQUAL         &trans
-&none  &none  &none  &none  &none      &none        &none      &kp N1     &kp N2     &kp N3      &kp LEFT_BRACKET  &kp RIGHT_BRACKET
-&none  &none  &none  &trans &trans     &none        &kp N0     &kp N0     &trans     &kp PERIOD  &kp LEFT_BRACE    &kp RIGHT_BRACE
+&kp KP_NUMLOCK  &none     &none      &none      &none      &none        &kp GRAVE  &kp SLASH  &kp ASTRK  &kp MINUS   &kp COMMA         &bspc_del
+&none  &none      &none      &none      &none      &none        &kp PIPE   &ac7       &ac8       &ac9        &kp PLUS          &kp BSLH
+&none  &kp LC(B)  &kp LC(I)  &kp LC(U)  &kp LSHFT  &none        &kp TAB    &ac4       &ac5       &ac6        &kp EQUAL         &trans
+&none  &none  &none  &none  &none      &none        &none      &ac1       &ac2       &ac3        &kp LEFT_BRACKET  &kp RIGHT_BRACKET
+&none  &kp LALT  &none  &trans &trans  &none        &ac0       &ac0       &trans     &kp PERIOD  &kp LEFT_BRACE    &kp RIGHT_BRACE
             >;
         };
 

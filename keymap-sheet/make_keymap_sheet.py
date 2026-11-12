@@ -42,7 +42,7 @@ KEY_NAMES = {
     "SLASH": "/", "MINUS": "-", "K_APP": "Menu", "GRAVE": "`", "ASTRK": "*", "PIPE": "|",
     "PLUS": "+", "BSLH": "\\", "EQUAL": "=", "LEFT_BRACKET": "[", "RIGHT_BRACKET": "]",
     "LEFT_BRACE": "{", "RIGHT_BRACE": "}", "HOME": "Home", "END": "End", "PAGE_UP": "Page Up",
-    "PAGE_DOWN": "Page Down", "PRINTSCREEN": "Print Screen", "SCROLLLOCK": "Scroll Lock", "DEL": "Delete",
+    "PAGE_DOWN": "Page Down", "KP_NUMLOCK": "Num Lock", "PRINTSCREEN": "Print Screen", "SCROLLLOCK": "Scroll Lock", "DEL": "Delete",
     "UP": "\u2191", "DOWN": "\u2193", "LEFT": "\u2190", "RIGHT": "\u2192",
     "C_PREV": "Prev track", "C_NEXT": "Next track", "C_PP": "Play / Pause", "C_VOL_UP": "Vol +",
     "C_VOL_DN": "Vol \u2212", "C_MUTE": "Mute",
@@ -69,6 +69,7 @@ def label(binding):
     if b == "&kp": return L(key_name(args[0]), SUBTITLE.get(args[0], ""))
     if b == "&trans": return L("", "", "trans")
     if b == "&none": return L("", "", "none")
+    if re.fullmatch(r"&ac\d", b): return L(b[-1])          # numpad digit (keypad digit while Alt is held)
     if b == "&bspc_del": return L("Backspace", "Shift: Delete")
     if b == "&word_bspc_del": return L("Delete word", "Shift: next word")
     if b == "&go_home": return L("Go home", "locked layers off")
@@ -199,6 +200,9 @@ NOTES = """
 While on: Backspace deletes the previous word, Shift+Backspace the next word, and Nav's Delete
 deletes the next word. Numpad's Backspace still deletes one character. Starts off after
 waking or power-on.</div>
+<div><h3>Alt codes (Windows)</h3>Hold <b>Thumb</b> (Numpad), hold <b>Alt</b> (its usual spot), type the code on the
+number keys, let go of Alt. Example: Alt 0176 = &deg;, Alt 0151 = &mdash;. If a code moves the cursor
+instead, tap <b>Num Lock</b> (Esc spot) once and try again.</div>
 <div><h3>Flashing new firmware</h3>Plug that half in by USB. Layer Lock, B, then the <b>Flash mode</b> key
 for that half (Esc spot = left, Backspace spot = right). A drive appears: copy the .uf2 file onto it.</div>
 <div><h3>Bluetooth</h3>Quick switch between devices 1 and 2: tap <b>Thumb</b>, then <b>Tab</b>.
