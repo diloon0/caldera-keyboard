@@ -4,3 +4,20 @@ jobs:
   build:
     # Keep this version in sync with `revision:` in config/west.yml
     uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@v0.3
+
+  # Draws the printable keymap sheet (keymap-sheet/make_keymap_sheet.py) from the keymap.
+  # It shows up as "keymap-sheet" under Artifacts, next to the firmware.
+  keymap-sheet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Draw the keymap sheet
+        run: |
+          python3 keymap-sheet/make_keymap_sheet.py
+          test -s keymap-sheet/cirrus-keymap.pdf
+      - uses: actions/upload-artifact@v4
+        with:
+          name: keymap-sheet
+          path: |
+            keymap-sheet/cirrus-keymap.pdf
+            keymap-sheet/cirrus-keymap.html

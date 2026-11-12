@@ -10,7 +10,7 @@ Re-run it after changing the keymap. Keys it doesn't know get their raw ZMK name
 name to KEY_NAMES or BEHAVIORS below. Note: changes made in ZMK Studio live on the keyboard,
 not in the keymap file, so they won't show up here.
 """
-import html, json, os, re, shutil, subprocess
+import html, json, os, pathlib, re, shutil, subprocess
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
@@ -228,14 +228,15 @@ def main():
     open(out_html, "w", encoding="utf-8").write(doc)
     print("wrote", out_html)
 
-    browser = next((p for p in (r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
-                                r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
-                                r"C:\Program Files\Google\Chrome\Application\chrome.exe",
-                                shutil.which("msedge") or "", shutil.which("chrome") or "") if p and os.path.exists(p)), None)
+    candidates = [r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+                  r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
+                  r"C:\Program Files\Google\Chrome\Application\chrome.exe"]
+    candidates += [shutil.which(n) or "" for n in ("msedge", "chrome", "google-chrome", "chromium", "chromium-browser")]
+    browser = next((p for p in candidates if p and os.path.exists(p)), None)
     if browser:
         out_pdf = os.path.join(HERE, "cirrus-keymap.pdf")
         subprocess.run([browser, "--headless", "--disable-gpu", "--no-pdf-header-footer",
-                        f"--print-to-pdf={out_pdf}", "file:///" + out_html.replace("\\", "/")],
+                        f"--print-to-pdf={out_pdf}", pathlib.Path(out_html).as_uri()],
                        capture_output=True, timeout=120)
         print("wrote", out_pdf if os.path.exists(out_pdf) else "(PDF failed - print the HTML from a browser)")
 
